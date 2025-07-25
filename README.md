@@ -7,4 +7,5 @@
 - Created Components
 - Configured BrowserRouter
 - Sign In - Sign Up Toggle Form
-- Validation for Login Page
+- Form Validation for email and password
+- Creating Firebase

@@ -1,7 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { checkValidation } from "../utils/validation";
 
 const Login = () => {
   const [toggleForm, setToggleForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState();
+
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
+  const handleSubmit = () => {
+    console.log(emailRef.current.value, passwordRef.current.value);
+    const message = checkValidation(
+      emailRef.current.value,
+      passwordRef.current.value
+    );
+    console.log(message);
+    setErrorMessage(message);
+  };
 
   const toggleSignInForm = () => {
     setToggleForm(!toggleForm);
@@ -16,7 +31,7 @@ const Login = () => {
           {toggleForm && (
             <div>
               <input
-                className="border-2 m-2 p-3 w-[90%] bg-gradient-to-l  from-gray-900 to-pink-800 rounded-lg"
+                className="border-2 m-2 p-3 w-[90%] bg-gradient-to-r  from-gray-900 to-pink-800 rounded-lg"
                 type="text"
                 placeholder="Name"
               />
@@ -24,6 +39,7 @@ const Login = () => {
           )}
           <div>
             <input
+              ref={emailRef}
               className="border-2 m-2 p-3 w-[90%] bg-gradient-to-l  from-gray-900 to-pink-800 rounded-lg"
               type="text"
               placeholder="Email ID"
@@ -31,12 +47,21 @@ const Login = () => {
           </div>
           <div>
             <input
+              ref={passwordRef}
               className="border-2 m-2 p-3 w-[90%] bg-gradient-to-r from-gray-900 to-pink-800 rounded-lg"
               type="password"
               placeholder="Password"
             />
           </div>
-          <button className="cursor-pointer border-2 mt-8 p-3 w-[90%] bg-gradient-to-t from-gray-900 to-pink-800 rounded-lg">
+          {errorMessage && (
+            <p className="text-red-400 font-bold text-left pl-6 mt-2">
+              {errorMessage}
+            </p>
+          )}
+          <button
+            onClick={handleSubmit}
+            className="cursor-pointer border-2 mt-8 p-3 w-[90%] bg-gradient-to-t from-gray-900 to-pink-800 rounded-lg"
+          >
             {!toggleForm ? "Sign In" : "Sign Up"}
           </button>
         </div>
