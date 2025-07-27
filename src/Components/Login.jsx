@@ -1,8 +1,13 @@
 import React, { useRef, useState } from "react";
 import { checkValidation } from "../utils/validation";
+import { auth } from "../utils/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Login = () => {
-  const [toggleForm, setToggleForm] = useState(false);
+  const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState();
 
   const emailRef = useRef(null);
@@ -16,19 +21,58 @@ const Login = () => {
     );
     console.log(message);
     setErrorMessage(message);
+    if (message) return;
+
+    if (!isSignInForm) {
+      createUserWithEmailAndPassword(
+        auth,
+        emailRef.current.value,
+        passwordRef.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+          // ..
+        });
+    } else {
+      //Sign In Logic
+      signInWithEmailAndPassword(
+        auth,
+        emailRef.current.value,
+        passwordRef.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    }
   };
 
   const toggleSignInForm = () => {
-    setToggleForm(!toggleForm);
+    setIsSignInForm(!isSignInForm);
   };
   return (
     <div className="grid place-items-center h-screen">
       <div className="border-2 m-2 p-4 w-1/4  items-center bg-gray-800 rounded-2xl">
         <p className="mt-5 pl-5 pb-2 text-2xl font-bold">
-          {!toggleForm ? "Sign In" : "Sign Up"}
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </p>
         <div className="text-center">
-          {toggleForm && (
+          {!isSignInForm && (
             <div>
               <input
                 className="border-2 m-2 p-3 w-[90%] bg-gradient-to-r  from-gray-900 to-pink-800 rounded-lg"
@@ -62,11 +106,11 @@ const Login = () => {
             onClick={handleSubmit}
             className="cursor-pointer border-2 mt-8 p-3 w-[90%] bg-gradient-to-t from-gray-900 to-pink-800 rounded-lg"
           >
-            {!toggleForm ? "Sign In" : "Sign Up"}
+            {isSignInForm ? "Sign In" : "Sign Up"}
           </button>
         </div>
         <p className="ml-6 mt-3 mb-5 cursor-pointer" onClick={toggleSignInForm}>
-          {!toggleForm
+          {isSignInForm
             ? "New to Buzzzy? Register here."
             : "Already have an account? Sign in here."}
         </p>
