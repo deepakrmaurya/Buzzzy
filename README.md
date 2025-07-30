@@ -9,3 +9,5 @@
 - Sign In - Sign Up Toggle Form
 - Form Validation for email and password
 - Creating Firebase
+- Implemented Sign In - Sign Up
+- Created Redux Store with userSlice

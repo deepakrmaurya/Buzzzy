@@ -4,12 +4,20 @@ import { auth } from "../utils/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState();
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
@@ -32,7 +40,27 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
+          updateProfile(user, {
+            displayName: nameRef.current.value,
+            photoURL: "/assets/profilepicture.png",
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+              navigate("/home");
+            })
+            .catch((error) => {
+              setErrorMessage(error);
+            });
           console.log(user);
+
           // ...
         })
         .catch((error) => {
@@ -42,17 +70,15 @@ const Login = () => {
           // ..
         });
     } else {
-      //Sign In Logic
       signInWithEmailAndPassword(
         auth,
         emailRef.current.value,
         passwordRef.current.value
       )
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
           console.log(user);
-          // ...
+          navigate("/home");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -75,6 +101,7 @@ const Login = () => {
           {!isSignInForm && (
             <div>
               <input
+                ref={nameRef}
                 className="border-2 m-2 p-3 w-[90%] bg-gradient-to-r  from-gray-900 to-pink-800 rounded-lg"
                 type="text"
                 placeholder="Name"
